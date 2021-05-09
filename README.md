@@ -46,7 +46,34 @@ output {
 - index 指定索引名称
 - user | password 这里没有安装xpack插件，所以用户名，密码不用配置，如果需要可以 自行配置
 
+### 多主机ELK系统搭建
+切换到 Swarm 模式，并创建一个新的 Swarm，将自身设置为 Swarm 的第一个管理节点
+```
+docker swarm init
+```
+
+列出群组中的节点
+```
+docker node ls
+```
+
+```
+docker stack deploy -c docker-compose.yaml elk
+```
+
+```
+docker service ls
+```
+
+```
+docker service logs elk_elasticsearch -f
+```
+
+```
+docker stack rm elk
+```
 
 ### 参考文档
 [logstash收集nginx日志](https://www.jianshu.com/p/cd41349c7e67)
 [https://github.com/deviantony/docker-elk](https://github.com/deviantony/docker-elk)
+[https://docs.docker.com/compose/compose-file/compose-file-v3/](https://docs.docker.com/compose/compose-file/compose-file-v3/)
