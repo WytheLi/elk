@@ -6,6 +6,10 @@ Logstash 主要是用来日志的搜集、分析、过滤日志的工具，支�
 Kibana 也是一个开源和免费的工具，Kibana可以为 Logstash 和 ElasticSearch 提供的日志分析友好的 Web 界面，可以帮助汇总、分析和搜索重要数据日志。
 
 ```
+docker-compose logs
+```
+
+```
 volumes:
   - /usr/share/logstash:/usr/share/logstash
   - /var/log/nginx:/var/log/nginx
@@ -45,3 +49,4 @@ output {
 
 ### 参考文档
 [logstash收集nginx日志](https://www.jianshu.com/p/cd41349c7e67)
+[https://github.com/deviantony/docker-elk](https://github.com/deviantony/docker-elk)

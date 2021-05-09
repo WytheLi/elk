@@ -1,0 +1,99 @@
+version: '2.2'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.1
+    container_name: elasticsearch  # 容器名称
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=es-docker-cluster    # 指定所属的集群名
+      - discovery.seed_hosts=elasticsearch01,elasticsearch02    # 负载到elasticsearch01 elasticsearch02
+      - cluster.initial_master_nodes=elasticsearch,elasticsearch01,elasticsearch02
+      - bootstrap.memory_lock=true    # 内存锁，以免对内存的过度使用造成内存溢出
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"  # 内存的使用范围
+    ulimits:
+      memlock:  # 配置memory_lock=ture后再在此处配置，打开权限
+        soft: -1
+        hard: -1
+    volumes:
+      - data01:/usr/share/elasticsearch/data  # 配置数据卷，将数据保存到宿主机中
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+  elasticsearch01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.1
+    container_name: elasticsearch01
+    environment:
+      - node.name=elasticsearch01
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=elasticsearch,elasticsearch02
+      - cluster.initial_master_nodes=elasticsearch,elasticsearch01,elasticsearch02
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data02:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+  elasticsearch02:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.1
+    container_name: elasticsearch02
+    environment:
+      - node.name=elasticsearch02
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=elasticsearch,elasticsearch01
+      - cluster.initial_master_nodes=elasticsearch,elasticsearch01,elasticsearch02
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data03:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.5.1
+    container_name: logstash
+    environment:
+      - "LS_JAVA_OPTS=-Xms256m -Xmx256m"
+    volumes:
+      - logstash:/usr/share/logstash
+      - /var/log/nginx:/var/log/nginx
+    networks:
+      - elastic
+    depends_on:
+      - elasticsearch
+      - elasticsearch01
+      - elasticsearch02
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.5.1
+    container_name: kibana
+    ports:
+      - 5601:5601
+    networks:
+      - elastic
+    depends_on:
+      - elasticsearch
+      - elasticsearch01
+      - elasticsearch02
+
+volumes:
+  data01:
+    driver: local
+  data02:
+    driver: local
+  data03:
+    driver: local
+  logstash:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge

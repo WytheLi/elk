@@ -74,6 +74,8 @@ volumes:
     driver: local
   esdata2:
     driver: local
+  logstash:
+    driver: local
 
 networks:
   esnet:
