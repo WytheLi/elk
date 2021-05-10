@@ -57,7 +57,7 @@ services:
       - elasticsearch
       - elasticsearch2
     volumes:
-      - logstash:/usr/share/logstash
+      - logstash2:/usr/share/logstash
       - /var/log/nginx:/var/log/nginx
   kibana:
     image: docker.elastic.co/kibana/kibana:6.2.4
@@ -75,6 +75,8 @@ volumes:
   esdata2:
     driver: local
   logstash:
+    driver: local
+  logstash2:
     driver: local
 
 networks:
